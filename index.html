@@ -1,38 +1,572 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ami Trans - Login</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CV — Rofik Kusuma Basyari</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ========== :root (theme vars) ========== */
+    :root{
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --accent: #0f69ff;
+      --accent-2: #004e92;
+      --glass: rgba(255,255,255,0.6);
+      --text: #0f172a;
+      --shadow: 0 6px 22px rgba(15,23,42,0.08);
+      --radius: 14px;
+      --transition: 320ms cubic-bezier(.2,.9,.3,1);
+    }
+    [data-theme="dark"]{
+      --bg: #071024;
+      --card: rgba(8,15,30,0.85);
+      --muted: #94a3b8;
+      --accent: #3aa3ff;
+      --accent-2: #54a0ff;
+      --glass: rgba(255,255,255,0.03);
+      --text: #e6eef9;
+      --shadow: 0 8px 30px rgba(2,6,23,0.6);
+    }
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="https://i.imgur.com/ivZMmoZ.png" />
+    /* ========== Reset & Base ========== */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 85%, black 15%) 100%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      transition: background var(--transition), color var(--transition);
+      padding:28px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+    }
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
+    /* ========== App Container ========== */
+    .app{
+      width:100%;
+      max-width:1100px;
+      min-height:640px;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35));
+      backdrop-filter: blur(6px);
+      transition: background var(--transition), box-shadow var(--transition);
+      display:grid;
+      grid-template-columns: 320px 1fr;
+    }
+    [data-theme="dark"] .app{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    }
 
-  <!-- Supabase & Scripts -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script defer src="supabase.js"></script>
-  <script defer src="script.js"></script>
+    /* ========== SIDEBAR ========== */
+    .sidebar{
+      padding:28px;
+      background:linear-gradient(180deg, var(--card), color-mix(in srgb, var(--card) 85%, black 5%));
+      border-right:1px solid rgba(0,0,0,0.04);
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-bottom:6px;
+    }
+    .brand .logo{
+      width:52px; height:52px; border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:flex; align-items:center; justify-content:center; color:#fff;
+      font-weight:700; box-shadow:0 6px 18px rgba(15,25,60,0.12);
+      transform:translateZ(0);
+    }
+    .brand .title{
+      font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .brand .sub{ font-size:12px; color:var(--muted) }
+
+    /* profile preview */
+    .profile-card{
+      margin-top:6px;
+      background:linear-gradient(180deg, var(--glass), rgba(255,255,255,0.02));
+      border-radius:12px;
+      padding:14px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.04);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .profile-card:hover{ transform: translateY(-6px); box-shadow: 0 18px 45px rgba(2,6,23,0.08); }
+    .avatar{
+      width:64px; height:64px; border-radius:50%;
+      overflow:hidden; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow: 0 6px 18px rgba(15,25,60,0.08);
+    }
+    .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .profile-info{ font-size:14px }
+    .profile-info .name{ font-weight:700; letter-spacing:0.2px; }
+    .profile-info .role{ font-size:12px; color:var(--muted); margin-top:4px; }
+
+    /* nav menu */
+    .menu{
+      margin-top:10px;
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .menu button{
+      display:flex; align-items:center; gap:12px; border:0; cursor:pointer;
+      background:transparent; padding:12px 14px; border-radius:10px;
+      font-weight:600; color:var(--muted);
+      transition: background var(--transition), color var(--transition), transform var(--transition);
+    }
+    .menu button:hover{ background: color-mix(in srgb, var(--accent) 8%, transparent); transform: translateX(6px); color:var(--accent-2) }
+    .menu button.active{ background: color-mix(in srgb, var(--accent) 12%, transparent); color:var(--accent-2) }
+
+    /* quick stats */
+    .stats{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap }
+    .stat{
+      min-width:120px;
+      padding:10px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35));
+      border-radius:10px;
+      font-weight:700; font-size:13px;
+      color:var(--text);
+      box-shadow: 0 6px 18px rgba(2,6,23,0.04);
+    }
+
+    /* bottom actions: theme + lang */
+    .sidebar .actions{ margin-top:auto; display:flex; gap:8px; align-items:center; justify-content:space-between }
+    .toggle, .langbtn{
+      border:0; padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600;
+      background:transparent; color:var(--muted);
+    }
+    .toggle:hover, .langbtn:hover{ background: color-mix(in srgb, var(--accent) 8%, transparent); color:var(--accent-2) }
+
+    /* ========== MAIN (content) ========== */
+    .main{
+      padding:32px; overflow:auto;
+      background:linear-gradient(180deg, transparent, rgba(0,0,0,0.02));
+    }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px;
+    }
+    .search{
+      flex:1; display:flex; gap:12px; align-items:center;
+    }
+    .title{
+      font-size:20px; font-weight:700; color:var(--accent-2);
+    }
+
+    /* content cards */
+    .grid{
+      display:grid; grid-template-columns: repeat(12,1fr); gap:18px;
+    }
+    .card{
+      grid-column: span 12;
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,0.02));
+      border-radius:12px; padding:18px; box-shadow:var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .card:hover{ transform: translateY(-6px); }
+
+    /* responsive columning */
+    @media(min-width:900px){
+      .card.col-4{ grid-column: span 4; }
+      .card.col-8{ grid-column: span 8; }
+      .card.col-6{ grid-column: span 6; }
+    }
+
+    /* dashboard specifics */
+    .hero{
+      display:flex; gap:22px; align-items:center;
+    }
+    .hero-left{ flex:1 }
+    .hero-right{ width:160px; display:flex; justify-content:center; align-items:center; }
+    .profile-hero{
+      width:140px; height:140px; border-radius:18px; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 18px 45px rgba(2,6,23,0.06);
+      transition: transform 420ms cubic-bezier(.2,.9,.3,1);
+    }
+    .profile-hero img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* skills badges */
+    .badges{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px }
+    .badge{
+      padding:8px 12px; border-radius:999px; font-weight:600; font-size:13px;
+      background: linear-gradient(90deg, rgba(15,105,255,0.12), rgba(0,78,146,0.08));
+      color:var(--accent-2);
+    }
+
+    /* experiences timeline */
+    .timeline{ display:flex; flex-direction:column; gap:14px; margin-top:8px }
+    .entry{
+      padding:12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35));
+      border-left:4px solid var(--accent-2);
+    }
+    .entry .meta{ font-size:13px; color:var(--muted); margin-bottom:6px }
+
+    /* contact */
+    .contact-list{ display:flex; flex-direction:column; gap:8px }
+    .contact-item{ display:flex; gap:12px; align-items:center; padding:10px; border-radius:10px; background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.35)); }
+
+    /* animations for section swap */
+    .fade-enter{ opacity:0; transform: translateY(12px); }
+    .fade-enter-active{ opacity:1; transform: translateY(0); transition: all 420ms cubic-bezier(.2,.9,.3,1); }
+
+    /* small screens: collapse sidebar into top */
+    @media(max-width:880px){
+      .app{ grid-template-columns: 1fr; min-height:100vh; border-radius:12px; }
+      .sidebar{ position:sticky; top:0; display:flex; flex-direction:row; gap:8px; padding:12px; align-items:center; border-right:none; border-bottom:1px solid rgba(0,0,0,0.04); }
+      .menu{ flex-direction:row; gap:6px; overflow:auto; padding-bottom:6px; }
+      .profile-card{ display:none; }
+      .main{ padding:18px; }
+      .hero-right{ display:none; }
+      .grid{ gap:12px; }
+    }
+
+    /* small polish */
+    a.link{ color:var(--accent-2); font-weight:600 }
+  </style>
 </head>
 <body>
-  <div class="login-wrapper">
-    <div class="login-card">
-      <!-- Logo -->
-      <img src="https://i.imgur.com/ivZMmoZ.png" alt="Ami Trans Logo" class="logo" />
-      <h2>Ami Trans</h2>
-      <form id="loginForm">
-        <div class="input-group">
-          <input type="email" id="email" placeholder="Email" required />
+  <div class="app" id="app" data-theme="light">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="brand">
+        <div class="logo">RK</div>
+        <div>
+          <div class="title" id="brandName">Rofik Kusuma</div>
+          <div class="sub" id="brandRole">Logistics Specialist</div>
         </div>
-        <div class="input-group">
-          <input type="password" id="password" placeholder="Password" required />
+      </div>
+
+      <div class="profile-card" aria-hidden="false">
+        <div class="avatar">
+          <img id="sidebarAvatar" src="" alt="avatar">
         </div>
-        <button type="submit">Login</button>
-        <div class="error" id="errorMsg"></div>
-      </form>
-    </div>
+        <div class="profile-info">
+          <div class="name" id="sidebarName">Rofik Kusuma B.</div>
+          <div class="role" id="sidebarRole">Logistics & Inventory</div>
+        </div>
+      </div>
+
+      <nav class="menu" role="navigation" aria-label="Main menu">
+        <button class="active" data-section="dashboard" id="m_dashboard">🏠 <span id="m_dashboard_text">Dashboard</span></button>
+        <button data-section="pengalaman" id="m_pengalaman">📁 <span id="m_pengalaman_text">Pengalaman Kerja</span></button>
+        <button data-section="skill" id="m_skill">🧠 <span id="m_skill_text">Skill & Keahlian</span></button>
+        <button data-section="kontak" id="m_kontak">📞 <span id="m_kontak_text">Kontak</span></button>
+      </nav>
+
+      <div class="stats" aria-hidden="true">
+        <div class="stat" id="stat_on_time">97%</div>
+        <div class="stat" id="stat_downtime">-15%</div>
+        <div class="stat" id="stat_profit">16.9M</div>
+      </div>
+
+      <div class="actions">
+        <button class="toggle" id="themeToggle" title="Toggle theme">🌙</button>
+        <div style="display:flex; gap:8px">
+          <button class="langbtn" id="langId">ID</button>
+          <button class="langbtn" id="langEn">EN</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main" id="main">
+      <div class="topbar">
+        <div class="title" id="titleSection">Dashboard</div>
+        <div style="display:flex; gap:12px; align-items:center">
+          <button id="downloadCv" class="link">Download CV</button>
+        </div>
+      </div>
+
+      <div class="grid" id="contentGrid">
+        <!-- HERO / DASHBOARD -->
+        <section class="card col-8" id="section_dashboard" data-section="dashboard">
+          <div class="hero">
+            <div class="hero-left">
+              <h2 id="hi">Halo, saya Rofik 👋</h2>
+              <p id="heroDesc">Logistics Specialist & Inventory Management dengan pengalaman 4+ tahun mengelola armada, optimizing route, dan menerapkan sistem digital untuk meningkatkan akurasi dan on-time delivery.</p>
+
+              <div class="badges" aria-hidden="true">
+                <div class="badge">Excel (Advanced)</div>
+                <div class="badge">WMS / TMS</div>
+                <div class="badge">Inventory Control</div>
+                <div class="badge">Process Improvement</div>
+              </div>
+            </div>
+
+            <div class="hero-right">
+              <div class="profile-hero" id="profileHero">
+                <img id="profileImage" src="" alt="profile">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- QUICK STATS -->
+        <section class="card col-4" id="section_stats" data-section="stats">
+          <h3 style="margin:0 0 10px 0" id="statsTitle">Highlights</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between">
+              <div style="color:var(--muted)">On-time delivery</div>
+              <div style="font-weight:800" id="stat_on_time_big">97%</div>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <div style="color:var(--muted)">Downtime reduced</div>
+              <div style="font-weight:800" id="stat_downtime_big">-15%</div>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <div style="color:var(--muted)">Gross profit</div>
+              <div style="font-weight:800" id="stat_profit_big">16.9M</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PENGALAMAN -->
+        <section class="card col-8" id="section_pengalaman" data-section="pengalaman" style="display:none">
+          <h3 id="expTitle">Pengalaman Kerja</h3>
+          <div class="timeline" id="timeline">
+            <div class="entry">
+              <div style="font-weight:700">Transport Supervisor — PT. Grahaprima Suksesmandiri, Tbk</div>
+              <div class="meta">Jun 2023 — Jul 2025</div>
+              <div>- Mengelola 30–40 unit armada; meningkatkan on-time delivery 90% → 97%.</div>
+              <div>- Mengimplementasikan sistem monitoring digital; akurasi laporan 60% → 84%.</div>
+            </div>
+
+            <div class="entry">
+              <div style="font-weight:700">Receiving Officer — PT. Sumber Alfaria Trijaya (Alfamart)</div>
+              <div class="meta">Jun 2022 — Jun 2023</div>
+              <div>- Menangani ~3.200 SKU/bulan; tingkat kesalahan <0.5%.</div>
+              <div>- Meningkatkan akurasi penerimaan 95% → 99%.</div>
+            </div>
+
+            <div class="entry">
+              <div style="font-weight:700">Inventory Control Specialist — PT. Juali Teknologi Indonesia (Kitabeli)</div>
+              <div class="meta">Mei 2020 — Jun 2022</div>
+              <div>- Akurasi stock opname 96% → 99.2%.</div>
+              <div>- Mengurangi kasus stockout 80 → 60 / tahun.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SKILL -->
+        <section class="card col-4" id="section_skill" data-section="skill" style="display:none">
+          <h3 id="skillTitle">Skill & Keahlian</h3>
+          <div style="margin-top:10px">
+            <div style="font-weight:700">Teknis</div>
+            <div style="margin-top:8px" class="badges">
+              <div class="badge">Microsoft Excel (Advanced)</div>
+              <div class="badge">ERP / WMS / TMS</div>
+            </div>
+
+            <div style="font-weight:700; margin-top:12px">Operasional & Soft</div>
+            <div style="margin-top:8px" class="badges">
+              <div class="badge">Routing</div>
+              <div class="badge">Inventory Control</div>
+              <div class="badge">Leadership</div>
+              <div class="badge">Communication</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- KONTAK -->
+        <section class="card col-12" id="section_kontak" data-section="kontak" style="display:none">
+          <h3 id="contactTitle">Kontak</h3>
+          <div class="contact-list">
+            <div class="contact-item"><strong>📞</strong> <div>+62 889-8932-7672</div></div>
+            <div class="contact-item"><strong>✉️</strong> <div>rofikkusuma010@gmail.com</div></div>
+            <div class="contact-item"><strong>📍</strong> <div>Gampengrejo, Kediri, Jawa Timur</div></div>
+            <div class="contact-item"><strong>🔗</strong> <div><a class="link" href="https://www.linkedin.com/in/rofik-kusuma-basyari" target="_blank" rel="noopener">LinkedIn</a></div></div>
+          </div>
+        </section>
+      </div>
+    </main>
   </div>
+
+  <script>
+    /* ========== Initial config ========== */
+    const app = document.getElementById('app');
+    // set default image url to the Imgur album you provided (replace with direct image link if available)
+    const profileImage = 'https://imgur.com/a/DYPX4gr'; // <--- REPLACE with direct image url (e.g. https://i.imgur.com/xxxx.jpg) for best result
+    document.getElementById('profileImage').src = profileImage;
+    document.getElementById('sidebarAvatar').src = profileImage;
+
+    // language packs
+    const LANG = {
+      id: {
+        dashboard: 'Dashboard',
+        pengalaman: 'Pengalaman Kerja',
+        skill: 'Skill & Keahlian',
+        kontak: 'Kontak',
+        hi: 'Halo, saya Rofik 👋',
+        heroDesc: 'Logistics Specialist & Inventory Management dengan pengalaman 4+ tahun mengelola armada, optimizing route, dan menerapkan sistem digital untuk meningkatkan akurasi dan on-time delivery.',
+        statsTitle: 'Highlights',
+        expTitle: 'Pengalaman Kerja',
+        skillTitle: 'Skill & Keahlian',
+        contactTitle: 'Kontak',
+        downloadCv: 'Download CV'
+      },
+      en: {
+        dashboard: 'Dashboard',
+        pengalaman: 'Work Experience',
+        skill: 'Skills & Expertise',
+        kontak: 'Contact',
+        hi: 'Hi, I\'m Rofik 👋',
+        heroDesc: 'Logistics Specialist & Inventory Management with 4+ years experience managing fleets, optimizing routes, and applying digital systems to improve accuracy and on-time delivery.',
+        statsTitle: 'Highlights',
+        expTitle: 'Work Experience',
+        skillTitle: 'Skills & Expertise',
+        contactTitle: 'Contact',
+        downloadCv: 'Download CV'
+      }
+    };
+
+    /* ========== Theme toggle ========== */
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('rk_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    app.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    themeToggle.addEventListener('click', () => {
+      const current = app.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      app.setAttribute('data-theme', next);
+      localStorage.setItem('rk_theme', next);
+      themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+      // subtle hero effect
+      const hero = document.getElementById('profileHero');
+      hero.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.05)' }, { transform: 'scale(1)' }], { duration: 420, easing: 'cubic-bezier(.2,.9,.3,1)' });
+    });
+
+    /* ========== Language toggle ========== */
+    const setLang = (lang) => {
+      const L = LANG[lang];
+      // menu
+      document.getElementById('m_dashboard_text').textContent = L.dashboard;
+      document.getElementById('m_pengalaman_text').textContent = L.pengalaman;
+      document.getElementById('m_skill_text').textContent = L.skill;
+      document.getElementById('m_kontak_text').textContent = L.kontak;
+      // titles and content
+      document.getElementById('titleSection').textContent = L.dashboard;
+      document.getElementById('hi').textContent = L.hi;
+      document.getElementById('heroDesc').textContent = L.heroDesc;
+      document.getElementById('statsTitle').textContent = L.statsTitle;
+      document.getElementById('expTitle').textContent = L.expTitle;
+      document.getElementById('skillTitle').textContent = L.skillTitle;
+      document.getElementById('contactTitle').textContent = L.contactTitle;
+      document.getElementById('downloadCv').textContent = L.downloadCv;
+    };
+
+    document.getElementById('langId').addEventListener('click', () => { setLang('id'); localStorage.setItem('rk_lang','id'); });
+    document.getElementById('langEn').addEventListener('click', () => { setLang('en'); localStorage.setItem('rk_lang','en'); });
+    const savedLang = localStorage.getItem('rk_lang') || 'id';
+    setLang(savedLang);
+
+    /* ========== Navigation (single-page behavior + animation) ========== */
+    const menuButtons = document.querySelectorAll('.menu button');
+    const sections = {
+      dashboard: document.getElementById('section_dashboard'),
+      pengalaman: document.getElementById('section_pengalaman'),
+      skill: document.getElementById('section_skill'),
+      kontak: document.getElementById('section_kontak')
+    };
+    const titleSection = document.getElementById('titleSection');
+
+    function showSection(name){
+      Object.values(sections).forEach(s => {
+        if (s.dataset.section === name){
+          s.style.display = ''; // default block
+          s.classList.add('fade-enter');
+          requestAnimationFrame(()=> s.classList.add('fade-enter-active'));
+          setTimeout(()=> { s.classList.remove('fade-enter','fade-enter-active'); }, 480);
+        } else {
+          s.style.display = 'none';
+        }
+      });
+      // highlight menu
+      menuButtons.forEach(b => b.classList.toggle('active', b.dataset.section === name));
+      // update top title (language-aware)
+      const lang = localStorage.getItem('rk_lang') || 'id';
+      const label = (lang === 'id') ? {dashboard:'Dashboard', pengalaman:'Pengalaman Kerja', skill:'Skill & Keahlian', kontak:'Kontak'} : {dashboard:'Dashboard', pengalaman:'Work Experience', skill:'Skills & Expertise', kontak:'Contact'};
+      titleSection.textContent = label[name] || 'Dashboard';
+      // small visual accent
+      const hero = document.getElementById('profileHero');
+      hero.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-6px)' }, { transform: 'translateY(0)' }], { duration: 420, easing: 'cubic-bezier(.2,.9,.3,1)' });
+      // scroll top of main content
+      document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    menuButtons.forEach(btn=>{
+      btn.addEventListener('click', ()=> showSection(btn.dataset.section));
+    });
+
+    // ensure initial active
+    showSection('dashboard');
+
+    /* ========== Download CV (simple PDF link action) ========== */
+    document.getElementById('downloadCv').addEventListener('click', ()=>{
+      // try to download a PDF if exists. Replace with real URL if you have one.
+      const pdfUrl = '/CV-Rofik-Kusuma-B.pdf'; // change to actual path if deployed
+      // fallback: open Linkedin profile
+      fetch(pdfUrl, {method:'HEAD'}).then(r=>{
+        if (r.ok) window.open(pdfUrl, '_blank');
+        else window.open('https://www.linkedin.com/in/rofik-kusuma-basyari', '_blank');
+      }).catch(()=> window.open('https://www.linkedin.com/in/rofik-kusuma-basyari', '_blank'));
+    });
+
+    /* ========== Small accessibility & keyboard shortcuts ========== */
+    document.addEventListener('keydown', (e)=>{
+      if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'k') {
+        // toggle theme with Ctrl/Cmd+K
+        themeToggle.click();
+      }
+      if (e.key === '1') showSection('dashboard');
+      if (e.key === '2') showSection('pengalaman');
+      if (e.key === '3') showSection('skill');
+      if (e.key === '4') showSection('kontak');
+    });
+
+    /* ========== Try to preload image; if image fails, show initials placeholder ========== */
+    const tryImg = new Image();
+    tryImg.src = profileImage;
+    tryImg.onload = () => {
+      document.getElementById('profileImage').src = profileImage;
+      document.getElementById('sidebarAvatar').src = profileImage;
+    };
+    tryImg.onerror = () => {
+      // show initials fallback
+      document.getElementById('profileImage').style.background = 'linear-gradient(135deg,var(--accent),var(--accent-2))';
+      document.getElementById('profileImage').style.display = 'flex';
+      document.getElementById('profileImage').style.alignItems = 'center';
+      document.getElementById('profileImage').style.justifyContent = 'center';
+      document.getElementById('profileImage').style.color = '#fff';
+      document.getElementById('profileImage').textContent = 'RK';
+      document.getElementById('sidebarAvatar').style.background = 'linear-gradient(135deg,var(--accent),var(--accent-2))';
+      document.getElementById('sidebarAvatar').innerHTML = '<div style="color:#fff;font-weight:800">RK</div>';
+    };
+
+    /* ========== On load: small entrance animations ========== */
+    window.addEventListener('load', ()=>{
+      document.querySelectorAll('.card').forEach((c, i)=>{
+        c.style.opacity = 0;
+        c.style.transform = 'translateY(8px)';
+        setTimeout(()=>{ c.style.transition = 'all 480ms cubic-bezier(.2,.9,.3,1)'; c.style.opacity = 1; c.style.transform = 'translateY(0)'; }, 80 * i);
+      });
+    });
+  </script>
 </body>
 </html>
